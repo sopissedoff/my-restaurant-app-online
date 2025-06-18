@@ -556,19 +556,34 @@ const App = () => {
         console.error("Firebase config is incomplete. Please ensure all REACT_APP_FIREBASE_ environment variables are set in Netlify.");
         // Fallback for development/Canvas if env vars are not set
         // In Canvas, __firebase_config and __app_id are provided
-        const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const canvasAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const canvasAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // The following lines were the cause of the issue and have been removed
+        // const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        // const canvasAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // const canvasAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        if (canvasFirebaseConfig && canvasAppId) {
-            console.warn("Using Canvas-provided Firebase config. Set Netlify environment variables for deployment.");
-            Object.assign(firebaseConfig, canvasFirebaseConfig); // Merge Canvas config
-            // Use canvasAuthToken if present, otherwise initialAuthToken remains undefined
-            // Note: initialAuthToken is only used if there's no existing user in onAuthStateChanged
+        // if (canvasFirebaseConfig && canvasAppId) {
+        //     console.warn("Using Canvas-provided Firebase config. Set Netlify environment variables for deployment.");
+        //     Object.assign(firebaseConfig, canvasFirebaseConfig); // Merge Canvas config
+        //     // Use canvasAuthToken if present, otherwise initialAuthToken remains undefined
+        //     // Note: initialAuthToken is only used if there's no existing user in onAuthStateChanged
+        // } else {
+        //     // This block will execute if running locally without .env and not in Canvas
+        //     console.error("Neither Netlify environment variables nor Canvas globals are available for Firebase configuration.");
+        //     // You might want to halt app loading or show a clear error to the user here
+        // }
+
+        // --- NEW Fallback for Canvas: Direct usage within Canvas environment ---
+        // This leverages the fact that __firebase_config etc. are globals in Canvas
+        if (typeof __firebase_config !== 'undefined') {
+            console.warn("Using Canvas-provided Firebase config.");
+            Object.assign(firebaseConfig, JSON.parse(__firebase_config));
+            // Ensure appId is correctly set from Canvas globals for Firestore paths
+            // if it's not provided via process.env
+            appId = typeof __app_id !== 'undefined' ? __app_id : appId; // Re-assign appId if Canvas provides it
+            // effectiveAuthToken logic below will handle __initial_auth_token
         } else {
-            // This block will execute if running locally without .env and not in Canvas
-            console.error("Neither Netlify environment variables nor Canvas globals are available for Firebase configuration.");
-            // You might want to halt app loading or show a clear error to the user here
+             // This block will execute if running locally without .env and not in Canvas
+            console.error("Neither Netlify environment variables nor Canvas globals are available for Firebase configuration. App may not function correctly.");
         }
       }
 
@@ -609,9 +624,10 @@ const App = () => {
 
   useEffect(() => {
     if (db && isAuthReady) {
-      // Use process.env variable for appId consistently
-      const appId = process.env.REACT_APP_FIREBASE_APP_ID || (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
-      const menuCollectionRef = collection(db, `artifacts/${appId}/public/data/menuItems`);
+      // Ensure appId used here is the one resolved by the initialization useEffect
+      // If process.env.REACT_APP_FIREBASE_APP_ID is set, use it. Otherwise, use Canvas global.
+      const resolvedAppId = process.env.REACT_APP_FIREBASE_APP_ID || (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
+      const menuCollectionRef = collection(db, `artifacts/${resolvedAppId}/public/data/menuItems`);
       
       const unsubscribe = onSnapshot(menuCollectionRef, (snapshot) => {
         const items = [];
