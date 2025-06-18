@@ -539,14 +539,35 @@ const App = () => {
   useEffect(() => {
     // 1. Initialize Firebase
     try {
-      const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+      // Define these variables to be accessible in the Netlify build environment
+      const appId = process.env.REACT_APP_FIREBASE_APP_ID || 'default-app-id';
+      const firebaseConfig = {
+        apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+        authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+        projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.REACT_APP_FIREBASE_APP_ID_CONFIG, // Use a different name to avoid conflict with our appId constant
+        measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
+      };
+      const initialAuthToken = process.env.REACT_APP_FIREBASE_AUTH_TOKEN;
 
-      if (!firebaseConfig) {
-        console.error("Firebase config is not defined. Please ensure __firebase_config is available.");
-        // Fallback or error handling for when running outside Canvas with no config
-        // For local development, you would replace this with your actual Firebase config
-        // return; // Don't return if you want to proceed with mock data if Firebase not configured
+
+      if (!firebaseConfig.apiKey || !firebaseConfig.projectId) { // Check for essential config
+        console.error("Firebase config is incomplete. Please ensure all REACT_APP_FIREBASE_ environment variables are set.");
+        // If running outside Canvas or without env vars, you might want to provide a default/mock config here
+        // For development, you would replace this with your actual Firebase config object:
+        /*
+        const firebaseConfig = {
+          apiKey: "YOUR_API_KEY",
+          authDomain: "YOUR_AUTH_DOMAIN",
+          projectId: "YOUR_PROJECT_ID",
+          storageBucket: "YOUR_STORAGE_BUCKET",
+          messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+          appId: "YOUR_APP_ID",
+          measurementId: "YOUR_MEASUREMENT_ID",
+        };
+        */
       }
 
       const app = initializeApp(firebaseConfig);
@@ -564,7 +585,6 @@ const App = () => {
         } else {
           // If no user, sign in anonymously
           try {
-            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
             if (initialAuthToken) {
               await signInWithCustomToken(firebaseAuth, initialAuthToken);
             } else {
@@ -588,7 +608,7 @@ const App = () => {
   // Fetch menu items from Firestore once Firebase is ready
   useEffect(() => {
     if (db && isAuthReady) {
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+      const appId = process.env.REACT_APP_FIREBASE_APP_ID || 'default-app-id'; // Use the env variable for appId
       // Path for public data: /artifacts/{appId}/public/data/menuItems
       const menuCollectionRef = collection(db, `artifacts/${appId}/public/data/menuItems`);
       
