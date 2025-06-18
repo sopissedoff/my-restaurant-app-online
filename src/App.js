@@ -539,7 +539,7 @@ const App = () => {
   useEffect(() => {
     // 1. Initialize Firebase
     try {
-      // Define these variables to be accessible in the Netlify build environment
+      // Corrected logic: ONLY use process.env variables for Netlify deployment
       const appId = process.env.REACT_APP_FIREBASE_APP_ID || 'default-app-id';
       const firebaseConfig = {
         apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -547,27 +547,29 @@ const App = () => {
         projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
         storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
         messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-        appId: process.env.REACT_APP_FIREBASE_APP_ID_CONFIG, // Use a different name to avoid conflict with our appId constant
+        appId: process.env.REACT_APP_FIREBASE_APP_ID_CONFIG,
         measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
       };
       const initialAuthToken = process.env.REACT_APP_FIREBASE_AUTH_TOKEN;
 
+      if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+        console.error("Firebase config is incomplete. Please ensure all REACT_APP_FIREBASE_ environment variables are set in Netlify.");
+        // Fallback for development/Canvas if env vars are not set
+        // In Canvas, __firebase_config and __app_id are provided
+        const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const canvasAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const canvasAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-      if (!firebaseConfig.apiKey || !firebaseConfig.projectId) { // Check for essential config
-        console.error("Firebase config is incomplete. Please ensure all REACT_APP_FIREBASE_ environment variables are set.");
-        // If running outside Canvas or without env vars, you might want to provide a default/mock config here
-        // For development, you would replace this with your actual Firebase config object:
-        /*
-        const firebaseConfig = {
-          apiKey: "YOUR_API_KEY",
-          authDomain: "YOUR_AUTH_DOMAIN",
-          projectId: "YOUR_PROJECT_ID",
-          storageBucket: "YOUR_STORAGE_BUCKET",
-          messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-          appId: "YOUR_APP_ID",
-          measurementId: "YOUR_MEASUREMENT_ID",
-        };
-        */
+        if (canvasFirebaseConfig && canvasAppId) {
+            console.warn("Using Canvas-provided Firebase config. Set Netlify environment variables for deployment.");
+            Object.assign(firebaseConfig, canvasFirebaseConfig); // Merge Canvas config
+            // Use canvasAuthToken if present, otherwise initialAuthToken remains undefined
+            // Note: initialAuthToken is only used if there's no existing user in onAuthStateChanged
+        } else {
+            // This block will execute if running locally without .env and not in Canvas
+            console.error("Neither Netlify environment variables nor Canvas globals are available for Firebase configuration.");
+            // You might want to halt app loading or show a clear error to the user here
+        }
       }
 
       const app = initializeApp(firebaseConfig);
@@ -577,42 +579,40 @@ const App = () => {
       setDb(firestore);
       setAuth(firebaseAuth);
 
-      // 2. Authenticate User (Anonymous for now, but listening for changes)
       const unsubscribeAuth = onAuthStateChanged(firebaseAuth, async (user) => {
         if (user) {
           setUserId(user.uid);
           setIsAuthReady(true);
         } else {
-          // If no user, sign in anonymously
           try {
-            if (initialAuthToken) {
-              await signInWithCustomToken(firebaseAuth, initialAuthToken);
+            // Prioritize Netlify's initialAuthToken, then Canvas's, then anonymous
+            const effectiveAuthToken = process.env.REACT_APP_FIREBASE_AUTH_TOKEN || (typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null);
+
+            if (effectiveAuthToken) {
+              await signInWithCustomToken(firebaseAuth, effectiveAuthToken);
             } else {
               await signInAnonymously(firebaseAuth);
             }
           } catch (error) {
             console.error("Error signing in anonymously or with custom token:", error);
-            setIsAuthReady(true); // Still set ready even on error to avoid infinite loading
+            setIsAuthReady(true);
           }
         }
       });
 
-      // Cleanup auth listener on component unmount
       return () => unsubscribeAuth();
 
     } catch (error) {
       console.error("Failed to initialize Firebase:", error);
     }
-  }, []); // Run only once on component mount
+  }, []);
 
-  // Fetch menu items from Firestore once Firebase is ready
   useEffect(() => {
     if (db && isAuthReady) {
-      const appId = process.env.REACT_APP_FIREBASE_APP_ID || 'default-app-id'; // Use the env variable for appId
-      // Path for public data: /artifacts/{appId}/public/data/menuItems
+      // Use process.env variable for appId consistently
+      const appId = process.env.REACT_APP_FIREBASE_APP_ID || (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
       const menuCollectionRef = collection(db, `artifacts/${appId}/public/data/menuItems`);
       
-      // Listen for real-time updates to the menu
       const unsubscribe = onSnapshot(menuCollectionRef, (snapshot) => {
         const items = [];
         snapshot.forEach(doc => {
@@ -621,21 +621,17 @@ const App = () => {
         setMenuItems(items);
       }, (error) => {
         console.error("Error fetching menu items: ", error);
-        // Fallback to mock data or display an error message if fetching fails
-        // For now, if there's an error, menuItems will remain empty or what it was before.
       });
 
-      // Cleanup listener on component unmount
       return () => unsubscribe();
     }
-  }, [db, isAuthReady]); // Re-run when db or auth state changes
+  }, [db, isAuthReady]);
 
   const handleNavigate = (page) => {
     setCurrentPage(page);
   };
 
   const handleAddToCart = (item) => {
-    // Check if the item (including options) is already in the cart
     const existingItemIndex = cartItems.findIndex(
       (cartItem) =>
         cartItem.id === item.id &&
@@ -643,7 +639,6 @@ const App = () => {
     );
 
     if (existingItemIndex > -1) {
-      // If it exists, update the quantity
       setCartItems((prevItems) =>
         prevItems.map((cartItem, index) =>
           index === existingItemIndex
@@ -652,7 +647,6 @@ const App = () => {
         )
       );
     } else {
-      // Otherwise, add as a new item
       setCartItems((prevItems) => [...prevItems, { ...item, quantity: item.quantity || 1 }]);
     }
   };
@@ -681,7 +675,6 @@ const App = () => {
     setSelectedItemForDetails(null);
   };
 
-  // Custom animations for better UI feedback
   const style = `
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     body {
@@ -770,7 +763,7 @@ const App = () => {
         currentPage={currentPage}
         onNavigate={handleNavigate}
         cartItemCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
-        userId={userId} // Pass userId to Header
+        userId={userId}
       />
 
       <main className="container mx-auto p-4 pt-16">
@@ -783,12 +776,12 @@ const App = () => {
             updateQuantity={updateQuantity}
             removeItem={removeItem}
             onNavigate={handleNavigate}
-            db={db} // Pass db to CartPage for order submission
-            userId={userId} // Pass userId to CartPage for order submission
-            setCartItems={setCartItems} // Pass setCartItems to CartPage to clear cart
+            db={db}
+            userId={userId}
+            setCartItems={setCartItems}
           />
         )}
-        {currentPage === 'rewards' && <RewardsPage db={db} userId={userId} />} {/* Pass db and userId to RewardsPage */}
+        {currentPage === 'rewards' && <RewardsPage db={db} userId={userId} />}
       </main>
 
       {selectedItemForDetails && (
