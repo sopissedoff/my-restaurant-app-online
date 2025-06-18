@@ -1,0 +1,108 @@
+3:28:29 PM: build-image version: c7d789db33033d118ad9bb27d4968225e0f4a584 (noble)
+3:28:29 PM: buildbot version: c7d789db33033d118ad9bb27d4968225e0f4a584
+3:28:29 PM: Fetching cached dependencies
+3:28:29 PM: Failed to fetch cache, continuing with build
+3:28:29 PM: Starting to prepare the repo for build
+3:28:29 PM: No cached dependencies found. Cloning fresh repo
+3:28:29 PM: git clone --filter=blob:none https://github.com/sopissedoff/my-restaurant-app-online
+3:28:29 PM: Preparing Git Reference refs/heads/main
+3:28:31 PM: Starting to install dependencies
+3:28:31 PM: Python version set to 3.13.3
+3:28:31 PM: Ruby version set to 3.4.3
+3:28:32 PM: Go version set to 1.24.4
+3:28:32 PM: Using PHP version
+3:28:34 PM: v22.16.0 is already installed.
+3:28:34 PM: Now using node v22.16.0 (npm v10.9.2)
+3:28:34 PM: Enabling Node.js Corepack
+3:28:34 PM: Started restoring cached build plugins
+3:28:34 PM: Finished restoring cached build plugins
+3:28:34 PM: Started restoring cached corepack dependencies
+3:28:34 PM: Finished restoring cached corepack dependencies
+3:28:34 PM: No npm workspaces detected
+3:28:34 PM: Started restoring cached node modules
+3:28:34 PM: Finished restoring cached node modules
+3:28:34 PM: Installing npm packages using npm version 10.9.2
+3:28:39 PM: npm warn deprecated w3c-hr-time@1.0.2: Use your platform's native performance.now() and performance.timeOrigin.
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+3:28:39 PM: npm warn deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead
+3:28:39 PM: npm warn deprecated stable@0.1.8: Modern JS already guarantees Array#sort() is a stable sort, so this library is deprecated. See the compatibility table on MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#browser_compatibility
+3:28:39 PM: npm warn deprecated rollup-plugin-terser@7.0.2: This package has been deprecated and is no longer maintained. Please use @rollup/plugin-terser
+3:28:39 PM: npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+3:28:39 PM: npm warn deprecated
+3:28:39 PM: npm warn deprecated (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
+3:28:40 PM: npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+3:28:40 PM: npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+3:28:41 PM: npm warn deprecated domexception@2.0.1: Use your platform's native DOMException instead
+npm warn deprecated abab@2.0.6: Use your platform's native atob() and btoa() methods instead
+npm warn deprecated workbox-google-analytics@6.6.0: It is not compatible with newer versions of GA starting with v4, as long as you are using GAv3 it should be ok, but the package is not longer being maintained
+3:28:41 PM: npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+3:28:41 PM: npm warn deprecated workbox-cacheable-response@6.6.0: workbox-background-sync@6.6.0
+3:28:41 PM: npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+3:28:42 PM: npm warn deprecated @babel/plugin-proposal-optional-chaining@7.21.0: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-optional-chaining instead.
+3:28:42 PM: npm warn deprecated @babel/plugin-proposal-private-methods@7.18.6: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-private-methods instead.
+3:28:42 PM: npm warn deprecated @babel/plugin-proposal-class-properties@7.18.6: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-class-properties instead.
+3:28:42 PM: npm warn deprecated @babel/plugin-proposal-nullish-coalescing-operator@7.18.6: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-nullish-coalescing-operator instead.
+3:28:42 PM: npm warn deprecated @babel/plugin-proposal-numeric-separator@7.18.6: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-numeric-separator instead.
+3:28:43 PM: npm warn deprecated @babel/plugin-proposal-private-property-in-object@7.21.11: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-private-property-in-object instead.
+3:28:44 PM: npm warn deprecated svgo@1.3.2: This SVGO version is no longer supported. Upgrade to v2.x.x.
+3:28:47 PM: npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+3:28:50 PM: added 1341 packages in 15s
+3:28:50 PM: npm packages installed
+3:28:50 PM: Successfully installed dependencies
+3:28:50 PM: Starting build script
+3:28:51 PM: Detected 1 framework(s)
+3:28:51 PM: "create-react-app" at version "5.0.1"
+3:28:51 PM: Section completed: initializing
+3:28:53 PM: ​
+3:28:53 PM: Netlify Build                                                 
+3:28:53 PM: ────────────────────────────────────────────────────────────────
+3:28:53 PM: ​
+3:28:53 PM: ❯ Version
+3:28:53 PM:   @netlify/build 33.4.6
+3:28:53 PM: ​
+3:28:53 PM: ❯ Flags
+3:28:53 PM:   accountId: 685320e69e5549f8836d3662
+3:28:53 PM:   baseRelDir: true
+3:28:53 PM:   buildId: 6853216bdeae92bd98c4cd8f
+3:28:53 PM:   deployId: 6853216bdeae92bd98c4cd91
+3:28:53 PM: ​
+3:28:53 PM: ❯ Current directory
+3:28:53 PM:   /opt/build/repo
+3:28:53 PM: ​
+3:28:53 PM: ❯ Config file
+3:28:53 PM:   No config file was defined: using default values.
+3:28:53 PM: ​
+3:28:53 PM: ❯ Context
+3:28:53 PM:   production
+3:28:53 PM: ​
+3:28:53 PM: Build command from Netlify app                                
+3:28:53 PM: ────────────────────────────────────────────────────────────────
+3:28:53 PM: ​
+3:28:53 PM: $ npm run build
+3:28:53 PM: > my-restaurant-app@0.1.0 build
+3:28:53 PM: > react-scripts build
+3:28:54 PM: Creating an optimized production build...
+3:28:55 PM: Failed to compile.
+3:28:55 PM: 
+3:28:55 PM: Module not found: Error: Can't resolve 'firebase/app' in '/opt/build/repo/src'
+3:28:55 PM: ​
+3:28:55 PM: "build.command" failed                                        
+3:28:55 PM: ────────────────────────────────────────────────────────────────
+3:28:55 PM: ​
+3:28:55 PM:   Error message
+3:28:55 PM:   Command failed with exit code 1: npm run build (https://ntl.fyi/exit-code-1)
+3:28:55 PM: ​
+3:28:55 PM:   Error location
+3:28:55 PM:   In Build command from Netlify app:
+3:28:55 PM:   npm run build
+3:28:55 PM: ​
+3:28:55 PM:   Resolved config
+3:28:55 PM:   build:
+3:28:55 PM:     command: npm run build
+3:28:55 PM:     commandOrigin: ui
+3:28:55 PM:     publish: /opt/build/repo/build
+3:28:55 PM:     publishOrigin: ui
+3:28:56 PM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
+3:28:56 PM: Build failed due to a user error: Build script returned non-zero exit code: 2
+3:28:56 PM: Failing build: Failed to build site
+3:28:56 PM: Finished processing build request in 27.169s
